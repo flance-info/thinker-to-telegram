@@ -1,6 +1,6 @@
 {
-    "bot_token": "your_bot_token",
-    "chat_id": "target_chat_id",
+    "bot_token": "7465085737:AAHiFAH8ZtldPXrhCShKgvObbttfvdoyehY",
+    "chat_id": "41862839",
     "file_path": "upload/screenshot.png",
     "download_directory": "downloaded_files"
 }
