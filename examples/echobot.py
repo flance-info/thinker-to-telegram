@@ -29,7 +29,6 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-
 # Define a few command handlers. These usually take the two arguments update and
 # context.
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -40,16 +39,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         reply_markup=ForceReply(selective=True),
     )
 
-
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     await update.message.reply_text("Help!")
-
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     await update.message.reply_text(update.message.text)
 
+async def echo_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Echo the photo message."""
+    file = await update.message.photo[-1].get_file()
+    await update.message.reply_photo(photo=file.file_id)
+
+async def echo_document(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Echo the document message."""
+    file = await update.message.document.get_file()
+    await update.message.reply_document(document=file.file_id)
 
 def main() -> None:
     """Start the bot."""
@@ -62,10 +68,12 @@ def main() -> None:
 
     # on non command i.e message - echo the message on Telegram
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    application.add_handler(MessageHandler(filters.PHOTO, echo_photo))
+    application.add_handler(MessageHandler(filters.Document.ALL, echo_document))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
-
 if __name__ == "__main__":
     main()
+    
