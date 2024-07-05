@@ -48,9 +48,9 @@ async def handle_document_photo(update: Update, context: ContextTypes.DEFAULT_TY
     file_path = new_file.file_path
 
     # Download the file
-    await new_file.download_to_drive(f'./downloaded_files/photo_{file_id}.jpg')
+    await new_file.download_to_drive(f'./downloaded_files/photo_{file_id}.png')
     await update.message.reply_text('Photo downloaded successfully.')
-    
+
 async def main():
     config = load_config('config.json')
     application = Application.builder().token(config['bot_token']).build()
