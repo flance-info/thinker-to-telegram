@@ -9,7 +9,6 @@ def load_config(file):
         return json.load(f)
 
 async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print("handle_document triggered")
     document = update.message.document
     file_id = document.file_id
     new_file = await context.bot.get_file(file_id)
@@ -22,19 +21,16 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await new_file.download_to_drive(file_path)
     await update.message.reply_text(f"File {document.file_name} received and downloaded to {file_path}")
 
-async def debug_update(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print(f"Received update: {update}")
-
 async def main():
     config = load_config('config.json')
     application = Application.builder().token(config['bot_token']).build()
     application.bot_data['download_directory'] = config['download_directory']
 
-    # Add handlers
-    application.add_handler(MessageHandler(filters.ALL, debug_update))
-    application.add_handler(MessageHandler(filters.Document.ALL, handle_document))
+    # Add the MessageHandler for handling documents
+    document_handler = MessageHandler(filters.Document.ALL, handle_document)
+    application.add_handler(document_handler)
 
-    # Initialize and start the application
+    # Start the bot
     await application.initialize()
     await application.start()
     await application.updater.start_polling()
@@ -43,16 +39,12 @@ async def main():
     # Wait for a shutdown signal (Ctrl+C)
     try:
         await asyncio.Future()  # Run forever
-    except asyncio.CancelledError:
+    except (KeyboardInterrupt, SystemExit):
         print("Bot is stopping...")
-    finally:
-        await application.updater.stop()  # Stop the updater before shutdown
-        await application.stop()
-        await application.shutdown()
-        print("Bot stopped.")
+
+    # Stop the bot
+    await application.stop()
+    await application.shutdown()
 
 if __name__ == '__main__':
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        print("Bot stopped.")
+    asyncio.run(main())
