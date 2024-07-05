@@ -7,6 +7,7 @@ from telegram.ext import Application, MessageHandler, filters, ContextTypes, Com
 from clipboard import send_to_clipboard  # Changed to absolute import
 import win32clipboard
 from io import BytesIO
+from PIL import Image
 
 # Enable logging
 logging.basicConfig(
@@ -24,7 +25,7 @@ def load_config(file):
     
 async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("handle_document triggered")
-    document: Document = update.message.document
+    document = update.message.document
     file_id = document.file_id
     new_file = await context.bot.get_file(file_id)
     
@@ -67,6 +68,19 @@ async def handle_document_photo(update: Update, context: ContextTypes.DEFAULT_TY
 
     # Download the file
     await new_file.download_to_drive(f'./downloaded_files/photo_{file_id}.png')
+    try:
+        with Image.open(new_file) as image:
+            output = BytesIO()
+            image.convert('RGB').save(output, format='BMP')
+            data = output.getvalue()[14:]
+            output.close()
+
+        send_to_clipboard(win32clipboard.CF_DIB, data)
+        print("Screenshot copied to clipboard!")
+    except Exception as e:
+        print(f"Error processing image: {e}")
+        await update.message.reply_text(f"Failed to process the file {document.file_name}")
+   
     await update.message.reply_text('Photo downloaded successfully.')
 
 async def main():
