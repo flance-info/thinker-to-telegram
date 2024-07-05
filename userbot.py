@@ -63,7 +63,9 @@ def send_screenshot():
         print(f"Error sending screenshot: {e}")
 
 if __name__ == '__main__':
-    keyboard.add_hotkey('alt+print_screen', lambda: send_screenshot())
+    keyboard.add_hotkey('alt+print_screen', send_screenshot)
 
     # Keep the script running
+    print("Press 'ALT + Print Screen' to capture the active window and send the screenshot.")
+    print("Press 'Esc' to stop the script.")
     keyboard.wait('esc')  # Press 'Esc' to stop the script
