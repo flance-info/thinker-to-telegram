@@ -32,7 +32,7 @@ async def main():
     await application.initialize()
     # Start polling
     await application.start()
-    application.updater.start_polling()
+    await application.updater.start_polling()
     print("Bot is running. Press Ctrl+C to stop.")
 
     # Run the application until manually stopped
