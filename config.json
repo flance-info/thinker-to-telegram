@@ -1,0 +1,6 @@
+{
+    "bot_token": "your_bot_token",
+    "chat_id": "target_chat_id",
+    "file_path": "upload/screenshot.png",
+    "download_directory": "downloaded_files"
+}
