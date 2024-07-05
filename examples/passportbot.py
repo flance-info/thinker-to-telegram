@@ -112,7 +112,7 @@ def main() -> None:
     # Create the Application and pass it your token and private key
     private_key = Path("private.key")
     application = (
-        Application.builder().token("TOKEN").private_key(private_key.read_bytes()).build()
+        Application.builder().token("7465085737:AAHiFAH8ZtldPXrhCShKgvObbttfvdoyehY").private_key(private_key.read_bytes()).build()
     )
 
     # On messages that include passport data call msg

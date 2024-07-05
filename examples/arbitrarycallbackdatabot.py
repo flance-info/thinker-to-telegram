@@ -97,7 +97,7 @@ def main() -> None:
     # Create the Application and pass it your bot's token.
     application = (
         Application.builder()
-        .token("TOKEN")
+        .token("7465085737:AAHiFAH8ZtldPXrhCShKgvObbttfvdoyehY")
         .persistence(persistence)
         .arbitrary_callback_data(True)
         .build()

@@ -109,7 +109,7 @@ async def deep_linked_level_4(update: Update, context: ContextTypes.DEFAULT_TYPE
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token("TOKEN").build()
+    application = Application.builder().token("7465085737:AAHiFAH8ZtldPXrhCShKgvObbttfvdoyehY").build()
 
     # More info on what deep linking actually is (read this first if it's unclear to you):
     # https://core.telegram.org/bots/features#deep-linking

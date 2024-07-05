@@ -157,7 +157,7 @@ async def start_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE)
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token("TOKEN").build()
+    application = Application.builder().token("7465085737:AAHiFAH8ZtldPXrhCShKgvObbttfvdoyehY").build()
 
     # Keep track of which chats the bot is in
     application.add_handler(ChatMemberHandler(track_chats, ChatMemberHandler.MY_CHAT_MEMBER))
