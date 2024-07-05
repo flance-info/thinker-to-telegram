@@ -22,10 +22,10 @@ async def send_file(file, file_name, config):
 
     # Get the user entity
     entity = await client.get_entity(username)
-    
+    print(file)
     # Send the file with the specific file name
-    await client.send_file(entity, file, caption="Screenshot", attributes=[], force_document=True, file_name=file_name)
-    print(f"File {file_name} sent successfully to {username}.")
+    await client.send_file(entity, file)
+    print(f"File {file} sent successfully to {username}.")
 
     await client.disconnect()
 
@@ -45,6 +45,9 @@ def get_clipboard_image():
 def send_screenshot():
     print("Capturing the active window...")
     
+    # Trigger ALT + Print Screen key press
+    keyboard.press_and_release('alt+print_screen')
+
     # Give some time for the screenshot to be copied to the clipboard
     time.sleep(1)
     
@@ -53,12 +56,10 @@ def send_screenshot():
         print("No image found in clipboard.")
         return
 
-    buffer = BytesIO()
-    screenshot.save(buffer, format='PNG')
-    buffer.seek(0)
-
+    temp_file_path = 'screenshot.png'
+    screenshot.save(temp_file_path, format='PNG')
     try:
-        main(buffer, 'screenshot.png')
+        main(temp_file_path, 'screenshot.png')
     except Exception as e:
         print(f"Error sending screenshot: {e}")
 
