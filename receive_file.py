@@ -17,24 +17,6 @@ logger = logging.getLogger(__name__)
 def load_config(file):
     with open(file, 'r') as f:
         return json.load(f)
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a message when the command /start is issued."""
-    user = update.effective_user
-    await update.message.reply_html(
-        rf"Hi {user.mention_html()}!",
-        reply_markup=ForceReply(selective=True),
-    )
-
-
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a message when the command /help is issued."""
-    await update.message.reply_text("Help!")
-
-
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Echo the user message."""
-    print(update.message.text)
-    await update.message.reply_text(update.message.text)
 
     
 async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -50,19 +32,34 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     file_path = os.path.join(download_directory, document.file_name)
     await new_file.download_to_drive(file_path)
     await update.message.reply_text(f"File {document.file_name} received and downloaded to {file_path}")
+# Photo handler
+async def handle_document_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    photo = update.message.photo
+    if not photo:
+        await update.message.reply_text('No photo found in the message.')
+        return
 
-async def debug_update(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print(f"Received update: {update}")
+    # Get the highest resolution photo (last in the list)
+    photo = photo[-1]
+    file_id = photo.file_id
 
+    # Get the file
+    new_file = await context.bot.get_file(file_id)
+    file_path = new_file.file_path
+
+    # Download the file
+    await new_file.download_to_drive(f'./downloaded_files/photo_{file_id}.jpg')
+    await update.message.reply_text('Photo downloaded successfully.')
+    
 async def main():
     config = load_config('config.json')
     application = Application.builder().token(config['bot_token']).build()
     application.bot_data['download_directory'] = config['download_directory']
 
     # Add handlers
-    application.add_handler(MessageHandler(filters.ALL, debug_update))
-    application.add_handler(MessageHandler(filters.All, handle_document))
-    
+   
+    application.add_handler(MessageHandler(filters.PHOTO, handle_document_photo))
+    application.add_handler(MessageHandler(filters.Document.ALL, handle_document))
 
     # Initialize and start the application
     await application.initialize()
@@ -81,28 +78,6 @@ async def main():
         await application.shutdown()
         print("Bot stopped.")
 
-
-
-def mainstart() -> None:
-    config = load_config('config.json')
-    """Start the bot."""
-    # Create the Application and pass it your bot's token.
-    application = Application.builder().token(config['bot_token']).build()
-
-    # on different commands - answer in Telegram
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", help_command))
-
-    # on non command i.e message - echo the message on Telegram
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
-
-    # Run the bot until the user presses Ctrl-C
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
-
-""" 
-if __name__ == "__main__":
-    mainstart() 
-"""
 if __name__ == '__main__':
     try:
        asyncio.run(main())
