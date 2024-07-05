@@ -24,7 +24,7 @@ async def send_file(file, file_name, config):
     entity = await client.get_entity(username)
     
     # Send the file with the specific file name
-    await client.send_file(entity, file, caption="Screenshot", file_name=file_name)
+    await client.send_file(entity, file, caption="Screenshot", attributes=[], force_document=True, file_name=file_name)
     print(f"File {file_name} sent successfully to {username}.")
 
     await client.disconnect()
