@@ -4,6 +4,9 @@ import asyncio
 import logging
 from telegram import ForceReply, Update
 from telegram.ext import Application, MessageHandler, filters, ContextTypes, CommandHandler
+from clipboard import send_to_clipboard  # Changed to absolute import
+import win32clipboard
+from io import BytesIO
 
 # Enable logging
 logging.basicConfig(
@@ -31,6 +34,13 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     file_path = os.path.join(download_directory, document.file_name)
     await new_file.download_to_drive(file_path)
+    output = BytesIO()
+    image.convert('RGB').save(output, format='BMP')
+    data = output.getvalue()[14:]
+    output.close()
+
+    send_to_clipboard(win32clipboard.CF_DIB, data)
+    print("Screenshot copied to clipboard!")
     await update.message.reply_text(f"File {document.file_name} received and downloaded to {file_path}")
 # Photo handler
 async def handle_document_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
