@@ -11,7 +11,7 @@ def load_config(file):
     with open(file, 'r') as f:
         return json.load(f)
 
-async def send_file(file, config):
+async def send_file(file, file_name, config):
     api_id = config['api_id']
     api_hash = config['api_hash']
     phone_number = config['phone_number']
@@ -23,15 +23,15 @@ async def send_file(file, config):
     # Get the user entity
     entity = await client.get_entity(username)
     
-    # Send the file
-    await client.send_file(entity, file)
-    print(f"File sent successfully to {username}.")
+    # Send the file with the specific file name
+    await client.send_file(entity, file, caption="Screenshot", file_name=file_name)
+    print(f"File {file_name} sent successfully to {username}.")
 
     await client.disconnect()
 
-def main(file): 
+def main(file, file_name): 
     config = load_config('config.json')
-    asyncio.run(send_file(file, config))
+    asyncio.run(send_file(file, file_name, config))
 
 def get_clipboard_image():
     try:
@@ -58,13 +58,11 @@ def send_screenshot():
     buffer.seek(0)
 
     try:
-        main(buffer)
+        main(buffer, 'screenshot.png')
     except Exception as e:
         print(f"Error sending screenshot: {e}")
 
-if __name__ == "__main__":
-
-    print("Press Alt + Print Screen to send a screenshot from clipboard")
+if __name__ == '__main__':
     keyboard.add_hotkey('alt+print_screen', lambda: send_screenshot())
 
     # Keep the script running
