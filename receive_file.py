@@ -24,7 +24,7 @@ def load_config(file):
     
 async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("handle_document triggered")
-    document = update.message.document
+    document: Document = update.message.document
     file_id = document.file_id
     new_file = await context.bot.get_file(file_id)
     
@@ -34,14 +34,22 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     file_path = os.path.join(download_directory, document.file_name)
     await new_file.download_to_drive(file_path)
-    output = BytesIO()
-    image.convert('RGB').save(output, format='BMP')
-    data = output.getvalue()[14:]
-    output.close()
+    
+    try:
+        with Image.open(file_path) as image:
+            output = BytesIO()
+            image.convert('RGB').save(output, format='BMP')
+            data = output.getvalue()[14:]
+            output.close()
 
-    send_to_clipboard(win32clipboard.CF_DIB, data)
-    print("Screenshot copied to clipboard!")
+        send_to_clipboard(win32clipboard.CF_DIB, data)
+        print("Screenshot copied to clipboard!")
+    except Exception as e:
+        print(f"Error processing image: {e}")
+        await update.message.reply_text(f"Failed to process the file {document.file_name}")
+
     await update.message.reply_text(f"File {document.file_name} received and downloaded to {file_path}")
+
 # Photo handler
 async def handle_document_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     photo = update.message.photo
