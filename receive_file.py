@@ -28,21 +28,22 @@ async def main():
     
     application.add_handler(MessageHandler(filters.Document.ALL, handle_document))
 
+    # Initialize the application
+    await application.initialize()
     # Start polling
     await application.start()
     application.updater.start_polling()
     print("Bot is running. Press Ctrl+C to stop.")
 
-    # Create an event to keep the script running
-    await application.updater._request.stop.wait()
-
-    # Graceful shutdown
-    await application.stop()
-    await application.shutdown()
+    # Run the application until manually stopped
+    try:
+        await asyncio.Event().wait()
+    finally:
+        await application.stop()
+        await application.shutdown()
 
 if __name__ == '__main__':
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         print("Bot stopped.")
-
