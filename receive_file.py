@@ -52,6 +52,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"File {document.file_name} received and downloaded to {file_path}")
 
 # Photo handler
+
 async def handle_document_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     photo = update.message.photo
     if not photo:
@@ -64,12 +65,16 @@ async def handle_document_photo(update: Update, context: ContextTypes.DEFAULT_TY
 
     # Get the file
     new_file = await context.bot.get_file(file_id)
-    file_path = new_file.file_path
+    file_path = f'./downloaded_files/photo_{file_id}.png'
+    
+    # Ensure the download directory exists
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
     # Download the file
-    await new_file.download_to_drive(f'./downloaded_files/photo_{file_id}.png')
+    await new_file.download_to_drive(file_path)
+    
     try:
-        with Image.open(new_file) as image:
+        with Image.open(file_path) as image:
             output = BytesIO()
             image.convert('RGB').save(output, format='BMP')
             data = output.getvalue()[14:]
@@ -79,10 +84,9 @@ async def handle_document_photo(update: Update, context: ContextTypes.DEFAULT_TY
         print("Screenshot copied to clipboard!")
     except Exception as e:
         print(f"Error processing image: {e}")
-        await update.message.reply_text(f"Failed to process the file {document.file_name}")
+        await update.message.reply_text(f"Failed to process the file {file_id}")
    
     await update.message.reply_text('Photo downloaded successfully.')
-
 async def main():
     config = load_config('config.json')
     application = Application.builder().token(config['bot_token']).build()

@@ -2,3 +2,9 @@
 *.json
 config.json
 config_user.json
+/build
+/dist
+/__pycache__
+/downloaded_files
+/downloaded_files
+*.jpg
